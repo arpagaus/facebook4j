@@ -40,6 +40,8 @@ public interface Comment extends FacebookResponse {
 
     Comment getParent();
 
+    PagableList<Comment> getComments();
+
     interface Attachment {
         String getDescription();
         AttachmentMedia getMedia();
