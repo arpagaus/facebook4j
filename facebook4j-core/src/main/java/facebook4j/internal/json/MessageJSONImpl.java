@@ -19,6 +19,7 @@ package facebook4j.internal.json;
 import facebook4j.Comment;
 import facebook4j.FacebookException;
 import facebook4j.IdNameEntity;
+import facebook4j.Image;
 import facebook4j.InboxResponseList;
 import facebook4j.Message;
 import facebook4j.PagableList;
@@ -45,6 +46,7 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
     private String id;
     private IdNameEntity from;
     private List<IdNameEntity> to;
+    private PagableList<Attachment> attachments;
     private String message;
     private Date createdTime;
     private Date updatedTime;
@@ -103,6 +105,22 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
             } else {
                 comments = new PagableListImpl<Comment>(0);
             }
+            if (!json.isNull("attachments")) {
+            	JSONObject attachmentsJSONObject = json.getJSONObject("attachments");
+            	if (!attachmentsJSONObject.isNull("data")) {
+            		JSONArray list = attachmentsJSONObject.getJSONArray("data");
+            		final int size = list.length();
+            		attachments = new PagableListImpl<Attachment>(size, attachmentsJSONObject);
+            		for (int i = 0; i < size; i++) {
+            			AttachmentJSONImpl attachment = new AttachmentJSONImpl(list.getJSONObject(i));
+            			attachments.add(attachment);
+            		}
+            	} else {
+            		attachments = new PagableListImpl<Attachment>(1, attachmentsJSONObject);
+            	}
+            } else {
+            	attachments = new PagableListImpl<Attachment>(0);
+            }
             if (!json.isNull("unread")) {
                 unread = getPrimitiveInt("unread", json);
             }
@@ -122,6 +140,9 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
     }
     public List<IdNameEntity> getTo() {
         return to;
+    }
+    public PagableList<Attachment> getAttachments() {
+    	return attachments;
     }
     public String getMessage() {
         return message;
@@ -229,11 +250,191 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
                 ", from=" + from +
                 ", to=" + to +
                 ", message='" + message + '\'' +
+                ", attachments='" + attachments + '\'' +
                 ", createdTime=" + createdTime +
                 ", updatedTime=" + updatedTime +
                 ", comments=" + comments +
                 ", unread=" + unread +
                 ", unseen=" + unseen +
                 '}';
+    }
+
+    private final class AttachmentJSONImpl implements Message.Attachment, java.io.Serializable {
+		private static final long serialVersionUID = 2383005779931406513L;
+
+        private String description;
+        private AttachmentMedia media;
+        private AttachmentTarget target;
+        private String title;
+        private String type;
+        private String url;
+
+        AttachmentJSONImpl(JSONObject json) throws FacebookException {
+            try {
+                description = getRawString("description", json);
+                if (!json.isNull("media")) {
+                    media = new AttachmentMediaJSONImpl(json.getJSONObject("media"));
+                }
+                if (!json.isNull("target")) {
+                    target = new AttachmentTargetJSONImpl(json.getJSONObject("target"));
+                }
+                title = getRawString("title", json);
+                type = getRawString("type", json);
+                url = getRawString("url", json);
+            } catch (JSONException jsone) {
+                throw new FacebookException(jsone.getMessage(), jsone);
+            }
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public AttachmentMedia getMedia() {
+            return media;
+        }
+
+        public AttachmentTarget getTarget() {
+            return target;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof AttachmentJSONImpl)) return false;
+
+            AttachmentJSONImpl that = (AttachmentJSONImpl) o;
+
+            if (description != null ? !description.equals(that.description) : that.description != null) return false;
+            if (media != null ? !media.equals(that.media) : that.media != null) return false;
+            if (target != null ? !target.equals(that.target) : that.target != null) return false;
+            if (title != null ? !title.equals(that.title) : that.title != null) return false;
+            if (type != null ? !type.equals(that.type) : that.type != null) return false;
+            if (url != null ? !url.equals(that.url) : that.url != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = description != null ? description.hashCode() : 0;
+            result = 31 * result + (media != null ? media.hashCode() : 0);
+            result = 31 * result + (target != null ? target.hashCode() : 0);
+            result = 31 * result + (title != null ? title.hashCode() : 0);
+            result = 31 * result + (type != null ? type.hashCode() : 0);
+            result = 31 * result + (url != null ? url.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "AttachmentJSONImpl{" +
+                    "description='" + description + '\'' +
+                    ", media=" + media +
+                    ", target=" + target +
+                    ", title='" + title + '\'' +
+                    ", type='" + type + '\'' +
+                    ", url='" + url + '\'' +
+                    '}';
+        }
+
+        private final class AttachmentMediaJSONImpl implements AttachmentMedia, java.io.Serializable {
+            private static final long serialVersionUID = -4030126370782822645L;
+
+            private final Image image;
+
+            AttachmentMediaJSONImpl(JSONObject json) throws FacebookException {
+                try {
+                    image = new ImageJSONImpl(json.getJSONObject("image"));
+                } catch (JSONException jsone) {
+                    throw new FacebookException(jsone.getMessage(), jsone);
+                }
+            }
+
+            public Image getImage() {
+                return image;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (!(o instanceof AttachmentMediaJSONImpl)) return false;
+
+                AttachmentMediaJSONImpl that = (AttachmentMediaJSONImpl) o;
+
+                return !(!image.equals(that.image));
+
+            }
+
+            @Override
+            public int hashCode() {
+                return image.hashCode();
+            }
+
+            @Override
+            public String toString() {
+                return "AttachmentMediaJSONImpl{" +
+                        "image=" + image +
+                        '}';
+            }
+        }
+
+        private final class AttachmentTargetJSONImpl implements AttachmentTarget, java.io.Serializable {
+            private String id;
+            private String url;
+
+            AttachmentTargetJSONImpl(JSONObject json) {
+                id = getRawString("id", json);
+                url = getRawString("url", json);
+            }
+
+            public String getId() {
+                return id;
+            }
+
+            public String getUrl() {
+                return url;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (!(o instanceof AttachmentTargetJSONImpl)) return false;
+
+                AttachmentTargetJSONImpl that = (AttachmentTargetJSONImpl) o;
+
+                if (id != null ? !id.equals(that.id) : that.id != null) return false;
+                if (url != null ? !url.equals(that.url) : that.url != null) return false;
+
+                return true;
+            }
+
+            @Override
+            public int hashCode() {
+                int result = id != null ? id.hashCode() : 0;
+                result = 31 * result + (url != null ? url.hashCode() : 0);
+                return result;
+            }
+
+            @Override
+            public String toString() {
+                return "AttachmentTargetJSONImpl{" +
+                        "id='" + id + '\'' +
+                        ", url='" + url + '\'' +
+                        '}';
+            }
+        }
     }
 }
