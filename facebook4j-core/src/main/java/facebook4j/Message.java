@@ -33,20 +33,10 @@ public interface Message extends FacebookResponse {
     Integer getUnseen();
 
     interface Attachment {
-        String getDescription();
-        AttachmentMedia getMedia();
-        AttachmentTarget getTarget();
-        String getTitle();
-        String getType();
+        String getName();
+        String getMimeType();
         String getUrl();
+        String getPreviewUrl();
 
-        interface AttachmentMedia {
-            Image getImage();
-        }
-
-        interface AttachmentTarget {
-            String getId();
-            String getUrl();
-        }
     }
 }
