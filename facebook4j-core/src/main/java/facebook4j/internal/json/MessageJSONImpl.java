@@ -19,7 +19,6 @@ package facebook4j.internal.json;
 import facebook4j.Comment;
 import facebook4j.FacebookException;
 import facebook4j.IdNameEntity;
-import facebook4j.Image;
 import facebook4j.InboxResponseList;
 import facebook4j.Message;
 import facebook4j.PagableList;
@@ -262,6 +261,7 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
     private final class AttachmentJSONImpl implements Message.Attachment, java.io.Serializable {
 		private static final long serialVersionUID = 2383005779931406513L;
 
+		private String id;
         private String name;
         private String mime_type;
         private String url;
@@ -269,6 +269,7 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
 
         AttachmentJSONImpl(JSONObject json) throws FacebookException {
             try {
+            	id = getRawString("id", json);
             	JSONObject mediaJson = null;
                 if (!json.isNull("video_data")) {
                 	mediaJson = json.getJSONObject("video_data");
@@ -290,6 +291,10 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
             } catch (JSONException jsone) {
                 throw new FacebookException(jsone.getMessage(), jsone);
             }
+        }
+
+        public String getId() {
+        	return id;
         }
 
         public String getName() {
@@ -315,6 +320,7 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
 
             AttachmentJSONImpl that = (AttachmentJSONImpl) o;
 
+            if (id != null ? !id.equals(that.id) : that.id != null) return false;
             if (name != null ? !name.equals(that.name) : that.name != null) return false;
             if (mime_type != null ? !mime_type.equals(that.mime_type) : that.mime_type != null) return false;
             if (url != null ? !url.equals(that.url) : that.url != null) return false;
@@ -325,7 +331,8 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
 
         @Override
         public int hashCode() {
-            int result = name != null ? name.hashCode() : 0;
+            int result = id != null ? id.hashCode() : 0;
+            result = 31 * result + (name != null ? name.hashCode() : 0);
             result = 31 * result + (mime_type != null ? mime_type.hashCode() : 0);
             result = 31 * result + (url != null ? url.hashCode() : 0);
             result = 31 * result + (preview_url != null ? preview_url.hashCode() : 0);
@@ -335,6 +342,7 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
         @Override
         public String toString() {
             return "AttachmentJSONImpl{" +
+            		", id='" + id + '\'' +
                     ", name='" + name + '\'' +
                     ", mime_type='" + mime_type + '\'' +
                     ", url='" + url + '\'' +
