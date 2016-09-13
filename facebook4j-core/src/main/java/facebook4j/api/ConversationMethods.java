@@ -16,6 +16,7 @@
 
 package facebook4j.api;
 
+import facebook4j.CommentUpdate;
 import facebook4j.Conversation;
 import facebook4j.FacebookException;
 import facebook4j.InboxResponseList;
@@ -79,5 +80,15 @@ public interface ConversationMethods {
      * @see <a href="https://developers.facebook.com/docs/reference/api/message/">Message - Facebook Developers</a>
      */
     Conversation getConversation(String conversationId, Reading reading) throws FacebookException;
+
+    /**
+     * Answer conversation.
+     * @param conversationId the ID of the conversation
+     * @param message comment text
+     * @return The new message ID
+     * @throws FacebookException when Facebook service or network is unavailable
+     * @see <a href="https://developers.facebook.com/docs/graph-api/reference/v2.7/conversation/messages">Conversation#messages - Facebook Developers</a>
+     */
+    String answerConversation(String conversationId, String message) throws FacebookException;
 
 }

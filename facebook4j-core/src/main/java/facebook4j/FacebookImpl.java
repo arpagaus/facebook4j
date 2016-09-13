@@ -796,6 +796,11 @@ class FacebookImpl extends FacebookBaseImpl implements Facebook {
         return _getComments(postId, reading);
     }
 
+    public String answerConversation(String conversationId, String message) throws FacebookException {
+    	ensureAuthorizationEnabled();
+    	return _answer(conversationId, message);
+    }
+
     public String commentPost(String postId, String message) throws FacebookException {
         ensureAuthorizationEnabled();
         return _comment(postId, message);
@@ -2765,6 +2770,18 @@ class FacebookImpl extends FacebookBaseImpl implements Facebook {
 
     private ResponseList<Post> _getSharedPosts(String objectId, Reading reading) throws FacebookException {
         return factory.createPostList(get(buildEndpoint(objectId, "sharedposts", reading)));
+    }
+
+    private String _answer(String objectId, String message) throws FacebookException {
+    	ensureAuthorizationEnabled();
+    	JSONObject json = post(buildEndpoint(objectId, "messages"),
+    			new HttpParameter[]{new HttpParameter("message", message)})
+    			.asJSONObject();
+    	try {
+    		return json.getString("id");
+    	} catch (JSONException jsone) {
+    		throw new FacebookException(jsone.getMessage(), jsone);
+    	}
     }
 
     private String _comment(String objectId, String message) throws FacebookException {
