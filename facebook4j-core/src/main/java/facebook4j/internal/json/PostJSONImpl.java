@@ -83,6 +83,7 @@ final class PostJSONImpl extends FacebookResponseImpl implements Post, java.io.S
     private Date createdTime;
     private Date updatedTime;
     private Boolean isPublished;
+    private Boolean isHidden;
     private Integer scheduledPublishTime;
     private Targeting targeting;
     private PagableList<Reaction> reactions;
@@ -266,6 +267,9 @@ final class PostJSONImpl extends FacebookResponseImpl implements Post, java.io.S
             if (!json.isNull("is_published")) {
                 isPublished = getBoolean("is_published", json);
             }
+            if (!json.isNull("is_hidden")) {
+            	isHidden = getBoolean("is_hidden", json);
+            }
             scheduledPublishTime = getInt("scheduled_publish_time", json);
             if (!json.isNull("targeting")) {
                 targeting = new TargetingJSONImpl(json.getJSONObject("targeting"));
@@ -415,6 +419,10 @@ final class PostJSONImpl extends FacebookResponseImpl implements Post, java.io.S
         return isPublished;
     }
 
+    public Boolean isHidden() {
+    	return isHidden;
+    }
+
     public Date getScheduledPublishTime() {
         if (scheduledPublishTime == null) {
             return null;
@@ -511,6 +519,7 @@ final class PostJSONImpl extends FacebookResponseImpl implements Post, java.io.S
                 ", createdTime=" + createdTime +
                 ", updatedTime=" + updatedTime +
                 ", isPublished=" + isPublished +
+                ", isHidden=" + isHidden +
                 ", scheduledPublishTime=" + scheduledPublishTime +
                 ", targeting=" + targeting +
                 '}';
@@ -574,7 +583,7 @@ final class PostJSONImpl extends FacebookResponseImpl implements Post, java.io.S
         }
 
     }
-    
+
     public PagableList<Reaction> getReactions() {
 		return reactions;
 	}
