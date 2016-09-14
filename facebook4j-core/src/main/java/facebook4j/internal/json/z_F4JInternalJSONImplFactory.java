@@ -537,8 +537,11 @@ public class z_F4JInternalJSONImplFactory implements z_F4JInternalFactory {
         if (jsonObjectType == Location.class) {
             return (ResponseList<T>) createLocationList(res);
         }
+        if (jsonObjectType == Conversation.class) {
+            return (ResponseList<T>) createConversationList(res);
+        }
         if (jsonObjectType == Message.class) {
-            return (ResponseList<T>) createMessageList(res);
+        	return (ResponseList<T>) createMessageList(res);
         }
         if (jsonObjectType == Note.class) {
             return (ResponseList<T>) createNoteList(res);
