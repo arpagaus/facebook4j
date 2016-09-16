@@ -750,7 +750,7 @@ class FacebookImpl extends FacebookBaseImpl implements Facebook {
         return getPosts("me", null);
     }
     public ResponseList<Post> getPosts(Reading reading) throws FacebookException {
-        return getPosts("117636188358883", reading);
+        return getPosts("me", reading);
     }
     public ResponseList<Post> getPosts(String id) throws FacebookException {
         return getPosts(id, null);
