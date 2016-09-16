@@ -24,7 +24,7 @@ public interface Message extends FacebookResponse {
     String getId();
     IdNameEntity getFrom();
     List<IdNameEntity> getTo();
-    PagableList<Attachment> getAttachments();
+    List<Attachment> getAttachments();
     String getMessage();
     Date getCreatedTime();
     Date getUpdatedTime();
@@ -38,6 +38,5 @@ public interface Message extends FacebookResponse {
         String getMimeType();
         String getUrl();
         String getPreviewUrl();
-
     }
 }

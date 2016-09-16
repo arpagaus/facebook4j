@@ -22,6 +22,7 @@ import facebook4j.Comment;
 import facebook4j.FacebookException;
 import facebook4j.IdNameEntity;
 import facebook4j.Like;
+import facebook4j.Message;
 import facebook4j.PagableList;
 import facebook4j.Place;
 import facebook4j.Post;
@@ -78,6 +79,7 @@ final class PostJSONImpl extends FacebookResponseImpl implements Post, java.io.S
     private Map<String, Tag[]> storyTags;
     private List<IdNameEntity> withTags;
     private PagableList<Comment> comments;
+    private List<Attachment> attachments;
     private String objectId;
     private Application application;
     private Date createdTime;
@@ -252,6 +254,17 @@ final class PostJSONImpl extends FacebookResponseImpl implements Post, java.io.S
             } else {
                 comments = new PagableListImpl<Comment>(0);
             }
+            if (!json.isNull("attachments")) {
+            	JSONArray attachmentsJSONArray = json.getJSONObject("attachments").getJSONArray("data");
+                final int size = attachmentsJSONArray.length();
+                attachments = new ArrayList<Attachment>(size);
+                for (int i = 0; i < attachmentsJSONArray.length(); i++) {
+                	JSONObject attachmentJsonObject = attachmentsJSONArray.getJSONObject(i);
+                   	attachments.add(new AttachmentJSONImpl(attachmentJsonObject));
+                }
+            } else {
+            	attachments = Collections.emptyList();
+            }
             if (!json.isNull("object_id")) {
                 objectId = getRawString("object_id", json);
             }
@@ -395,6 +408,10 @@ final class PostJSONImpl extends FacebookResponseImpl implements Post, java.io.S
         return comments;
     }
 
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
     public String getObjectId() {
         return objectId;
     }
@@ -514,6 +531,7 @@ final class PostJSONImpl extends FacebookResponseImpl implements Post, java.io.S
                 ", storyTags=" + storyTags +
                 ", withTags=" + withTags +
                 ", comments=" + comments +
+                ", attachments=" + attachments +
                 ", objectId='" + objectId + '\'' +
                 ", application=" + application +
                 ", createdTime=" + createdTime +
@@ -582,6 +600,113 @@ final class PostJSONImpl extends FacebookResponseImpl implements Post, java.io.S
             return "Post.ActionJSONImpl [name=" + name + ", link=" + link + "]";
         }
 
+    }
+
+    private final class AttachmentJSONImpl implements Post.Attachment, java.io.Serializable {
+		private static final long serialVersionUID = 8479952805957989278L;
+
+		private String id;
+        private String title;
+        private String type;
+        private String url;
+        private List<Attachment> subattachments;
+
+        AttachmentJSONImpl(JSONObject json) throws FacebookException {
+            try {
+            	if (!json.isNull("target")) {
+            		JSONObject targetJSONObject = json.getJSONObject("target");
+            		id = getRawString("id", targetJSONObject);
+            	}
+            	if (!json.isNull("media")) {
+            		JSONObject mediaJSONObject = json.getJSONObject("media");
+            		JSONObject mediaJson = null;
+            		if (!mediaJSONObject.isNull("video")) {
+            			mediaJson = mediaJSONObject.getJSONObject("video");
+            		}
+            		else if (!mediaJSONObject.isNull("image")) {
+            			mediaJson = mediaJSONObject.getJSONObject("image");
+            		}
+            		if(mediaJson!=null){
+            			url = getRawString("src", mediaJson);
+            		}
+            		else{
+            			url = getRawString("file_url", mediaJSONObject);
+            		}
+            	}
+                title = getRawString("title", json);
+                type = getRawString("type", json);
+                if (!json.isNull("subattachments")) {
+                	JSONArray attachmentsJSONArray = json.getJSONObject("subattachments").getJSONArray("data");
+                    final int size = attachmentsJSONArray.length();
+                    subattachments = new ArrayList<Attachment>(size);
+                    for (int i = 0; i < attachmentsJSONArray.length(); i++) {
+                    	JSONObject attachmentJsonObject = attachmentsJSONArray.getJSONObject(i);
+                    	subattachments.add(new AttachmentJSONImpl(attachmentJsonObject));
+                    }
+                } else {
+                	subattachments = Collections.emptyList();
+                }
+            } catch (JSONException jsone) {
+                throw new FacebookException(jsone.getMessage(), jsone);
+            }
+        }
+
+        public String getId() {
+        	return id;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public List<Attachment> getSubattachments() {
+			return subattachments;
+		}
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof AttachmentJSONImpl)) return false;
+
+            AttachmentJSONImpl that = (AttachmentJSONImpl) o;
+
+            if (id != null ? !id.equals(that.id) : that.id != null) return false;
+            if (title != null ? !title.equals(that.title) : that.title != null) return false;
+            if (type != null ? !type.equals(that.type) : that.type != null) return false;
+            if (url != null ? !url.equals(that.url) : that.url != null) return false;
+            if (subattachments != null ? !subattachments.equals(that.subattachments) : that.subattachments != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = id != null ? id.hashCode() : 0;
+            result = 31 * result + (title != null ? title.hashCode() : 0);
+            result = 31 * result + (type != null ? type.hashCode() : 0);
+            result = 31 * result + (url != null ? url.hashCode() : 0);
+            result = 31 * result + (subattachments != null ? subattachments.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "AttachmentJSONImpl{" +
+            		", id='" + id + '\'' +
+                    ", title='" + title + '\'' +
+                    ", type='" + type + '\'' +
+                    ", url='" + url + '\'' +
+                    ", subattachments=" + subattachments +
+                    '}';
+        }
     }
 
     public PagableList<Reaction> getReactions() {

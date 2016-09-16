@@ -50,6 +50,7 @@ public interface Post extends FacebookResponse {
     Map<String, Tag[]> getStoryTags();
     List<IdNameEntity> getWithTags();
     PagableList<Comment> getComments();
+    List<Attachment> getAttachments();
     String getObjectId();
     String getParentId();
     Application getApplication();
@@ -60,16 +61,24 @@ public interface Post extends FacebookResponse {
     Date getScheduledPublishTime();
     Targeting getTargeting();
     PagableList<Reaction> getReactions();
-    
+
     interface Action {
         String getName();
         String getLink();
     }
-    
+
     interface Property {
         String getName();
         String getText();
         String getHref();
+    }
+
+    interface Attachment {
+    	String getId();
+        String getTitle();
+        String getType();
+        String getUrl();
+        List<Attachment> getSubattachments();
     }
 
 }
