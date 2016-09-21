@@ -54,6 +54,7 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
     private Integer likeCount;
     private Integer commentCount;
     private Boolean isUserLikes;
+    private Boolean isHidden;
     private Attachment attachment;
     private Comment parent;
     private PagableList<Comment> comments;
@@ -101,6 +102,7 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
             likeCount = getInt("like_count", json);
             commentCount = getInt("comment_count", json);
             isUserLikes = getBoolean("user_likes", json);
+            isHidden = getBoolean("is_hidden", json);
             if (!json.isNull("attachment")) {
                 attachment = new AttachmentJSONImpl(json.getJSONObject("attachment"));
             }
@@ -174,6 +176,10 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
 
     public Boolean isUserLikes() {
         return isUserLikes;
+    }
+
+    public Boolean isHidden() {
+    	return isHidden;
     }
 
     public Attachment getAttachment() {
@@ -255,6 +261,7 @@ import static facebook4j.internal.util.z_F4JInternalParseUtil.*;
                 ", likeCount=" + likeCount +
                 ", commentCount=" + commentCount +
                 ", isUserLikes=" + isUserLikes +
+                ", isHidden=" + isHidden +
                 ", attachment=" + attachment +
                 ", parent=" + parent +
                 ", comments=" + comments +
