@@ -24,5 +24,7 @@ public enum PictureSize {
     small,
     normal,
     large,
+    thumbnail,
+    album,
     ;
 }
